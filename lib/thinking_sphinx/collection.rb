@@ -51,6 +51,8 @@ module ThinkingSphinx
         :select     => (options[:select]  || index_options[:select]),
         :order      => (options[:sql_order] || index_options[:sql_order])
       ) : []
+      
+      include_attributes(instances, matches, options) if options[:with_attributes]
 
       # Raise an exception if we find records in Sphinx but not in the DB, so
       # the search method can retry without them. See 
@@ -89,6 +91,19 @@ module ThinkingSphinx
       end
     end
     
+    def self.include_attributes(instances, results, options) 
+      results.each do |result|
+        atts = result[:attributes]
+        options[:with_attributes].each do |att|
+          meth = att.to_s+'='
+          model = instances.find atts["id"].to_i
+          if atts.include?(att.to_s) && model.respond_to?(meth)
+            model.send(meth, atts[att.to_s])
+          end
+        end
+      end
+    end
+
     def self.class_from_crc(crc)
       @@models_by_crc ||= ThinkingSphinx.indexed_models.inject({}) do |hash, model|
         hash[model.constantize.to_crc32] = model

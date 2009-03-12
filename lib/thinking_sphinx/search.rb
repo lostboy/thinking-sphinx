@@ -554,13 +554,9 @@ module ThinkingSphinx
         
         conditions.each do |key,val|
           if attributes.include?(key.to_sym)
-            if val.is_a?(Array) 
-              for v in val
-                filters << create_filter(key, v)
-              end
-            else
-              filters << create_filter(key, val)
-            end
+            filters << Riddle::Client::Filter.new(
+              key.to_s, filter_value(val)
+            )
           else
             search_string << "@#{key} #{val}"
           end
@@ -653,15 +649,6 @@ module ThinkingSphinx
         }
         
         string
-      end
-      
-      private
-      
-      def self.create_filter(key, val)
-        Riddle::Client::Filter.new(
-          key.to_s,
-          val.is_a?(Range) ? val : Array(val)
-        )
       end
       
     end
