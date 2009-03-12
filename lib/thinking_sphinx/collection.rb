@@ -92,11 +92,11 @@ module ThinkingSphinx
     end
     
     def self.include_attributes(instances, results, options) 
-      results.each do |result|
+      results.each do |result|  
         atts = result[:attributes]
         options[:with_attributes].each do |att|
           meth = att.to_s+'='
-          model = instances.find atts["id"].to_i
+          model = instances.find {|m| m.id == atts["id"].to_i }
           if atts.include?(att.to_s) && model.respond_to?(meth)
             model.send(meth, atts[att.to_s])
           end
