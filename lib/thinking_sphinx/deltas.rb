@@ -16,6 +16,12 @@ module ThinkingSphinx
       when FalseClass, nil
         nil
       else
+        if delta_option.class == String
+          begin
+            delta_option = eval(delta_option)
+          rescue
+          end
+        end
         if delta_option.ancestors.include?(ThinkingSphinx::Deltas::DefaultDelta)
           delta_option.new index, options
         else
